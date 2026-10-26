@@ -1,0 +1,31 @@
+# Node
+node_modules/
+.next/
+out/
+coverage/
+playwright-report/
+test-results/
+*.log
+npm-debug.log*
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+backend/cupcake.db
+backend/*.db
+
+# Env
+.env
+.env.*
+!.env.example
+
+# OS
+.DS_Store
+
+# Docker
+postgres_data/
+media/

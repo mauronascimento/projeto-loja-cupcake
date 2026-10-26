@@ -1,0 +1,81 @@
+services:
+  database:
+    image: postgres:17-alpine
+    container_name: cupcake-db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-cupcake_db}
+      POSTGRES_USER: ${POSTGRES_USER:-cupcake_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Configure POSTGRES_PASSWORD no .env}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-cupcake_user} -d ${POSTGRES_DB:-cupcake_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - cupcake-net
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: cupcake-backend
+    env_file:
+      - .env
+    environment:
+      APP_ENV: ${APP_ENV:-development}
+      POSTGRES_HOST: database
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB:-cupcake_db}
+      POSTGRES_USER: ${POSTGRES_USER:-cupcake_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Configure POSTGRES_PASSWORD no .env}
+      SECRET_KEY: ${SECRET_KEY:?Configure SECRET_KEY no .env}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:?Configure ADMIN_EMAIL no .env}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Configure ADMIN_PASSWORD no .env}
+      FRONTEND_ORIGIN: ${FRONTEND_ORIGIN:-http://localhost:3000}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      MEDIA_ROOT: /app/media/products
+      SEED_ASSETS: /app/assets/seed-products
+      BACKEND_HOST: 0.0.0.0
+      BACKEND_PORT: 8000
+    depends_on:
+      database:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - media_data:/app/media
+    ports:
+      - "127.0.0.1:8000:8000"
+    networks:
+      - cupcake-net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8000/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        API_INTERNAL_URL: http://backend:8000
+    container_name: cupcake-frontend
+    env_file:
+      - .env
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    networks:
+      - cupcake-net
+
+networks:
+  cupcake-net:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  media_data:

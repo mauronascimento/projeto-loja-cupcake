@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480">
+  <rect width="640" height="480" fill="#f8e8e6"/>
+  <circle cx="320" cy="195" r="118" fill="#e7b8bb"/>
+  <path d="M214 257h212l-23 137H237z" fill="#c98d83"/>
+  <path d="M252 253c-34-20-33-64 5-80 5-55 76-72 103-29 41-1 62 48 35 78 30 20 16 65-19 73H267c-7-10-12-23-15-42z" fill="#fff9f4"/>
+  <circle cx="320" cy="168" r="17" fill="#b96c77"/>
+  <text x="320" y="448" text-anchor="middle" font-family="Arial,sans-serif" font-size="22" fill="#6b504b">Cupcake artesanal</text>
+</svg>
