@@ -171,7 +171,7 @@ def create_product(
         descricao=payload.descricao,
         preco=payload.preco,
         imagem_path="fallback.svg",
-        quantidade_estoque=payload.quantidade_inicial,
+        quantidade_estoque=0,
         ativo=True,
     )
     db.add(product)

@@ -132,7 +132,7 @@ def seed_data(db: Session) -> None:
             descricao=description,
             preco=Decimal(price),
             imagem_path=image_path,
-            quantidade_estoque=quantity,
+            quantidade_estoque=0,
             ativo=True,
         )
         db.add(product)

@@ -13,6 +13,8 @@ __pycache__/
 *.py[cod]
 .venv/
 .pytest_cache/
+.coverage
+frontend/tsconfig.tsbuildinfo
 .mypy_cache/
 .ruff_cache/
 backend/cupcake.db

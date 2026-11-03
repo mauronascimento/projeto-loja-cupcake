@@ -39,3 +39,47 @@ def api_client():
         app.dependency_overrides.clear()
         Base.metadata.drop_all(engine)
         engine.dispose()
+
+
+@pytest.fixture
+def database_session(api_client):
+    from app.database import get_db
+    from app.main import app
+
+    generator = app.dependency_overrides[get_db]()
+    db = next(generator)
+    try:
+        yield db
+    finally:
+        generator.close()
+
+
+@pytest.fixture
+def admin_client(api_client, database_session):
+    from app.models import User, UserRole
+    from app.utils.security import hash_password
+
+    database_session.add(
+        User(
+            nome_completo="Administrador de Teste",
+            telefone="11912345678",
+            email="admin-test@example.com",
+            senha_hash=hash_password("senha-admin-de-teste"),
+            perfil=UserRole.ADMIN,
+            cep="01310100",
+            logradouro="Avenida Paulista",
+            numero="1000",
+            complemento=None,
+            bairro="Bela Vista",
+            cidade="São Paulo",
+            uf="SP",
+            ativo=True,
+        )
+    )
+    database_session.commit()
+    response = api_client.post(
+        "/api/v1/auth/login",
+        json={"email": "admin-test@example.com", "senha": "senha-admin-de-teste"},
+    )
+    assert response.status_code == 200, response.text
+    return api_client

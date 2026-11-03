@@ -2,9 +2,9 @@
 
 > **Especificação executável para Claude Code, GitHub Copilot ou outro agente de desenvolvimento.**
 >
-> **Versão da especificação:** 1.0 — 25/10/2026  
-> **Idioma do sistema:** Português do Brasil (pt-BR)  
-> **Natureza:** trabalho acadêmico de Engenharia de Software; aplicação demonstrativa integralmente funcional.  
+> **Versão da especificação:** 1.0 — 25/10/2026
+> **Idioma do sistema:** Português do Brasil (pt-BR)
+> **Natureza:** trabalho acadêmico de Engenharia de Software; aplicação demonstrativa integralmente funcional.
 > **Status:** escopo funcional, arquitetura e UX consolidados. Implementar, executar, testar e corrigir; não criar funcionalidades fora deste documento.
 
 ---

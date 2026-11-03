@@ -108,9 +108,9 @@ test('cliente cria, acompanha e cancela um pedido demonstrativo', async ({ page 
 });
 
 test('administrador acessa gestão, estoque, pedidos e relatórios', async ({ page }) => {
-  const email = process.env.E2E_ADMIN_EMAIL;
-  const password = process.env.E2E_ADMIN_PASSWORD;
-  test.skip(!email || !password, 'Defina E2E_ADMIN_EMAIL e E2E_ADMIN_PASSWORD para executar este fluxo.');
+  const email = process.env.ADMIN_EMAIL;
+  const password = process.env.ADMIN_PASSWORD;
+  test.skip(!email || !password, 'Defina ADMIN_EMAIL e ADMIN_PASSWORD para executar este fluxo.');
 
   const browserErrors = collectBrowserErrors(page);
   await page.goto('/login?next=/admin');
