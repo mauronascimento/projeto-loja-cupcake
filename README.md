@@ -65,20 +65,48 @@ administrativa forte com pelo menos 12 caracteres. Não versione o `.env`.
 
 ## Testes
 
-```bash
-cd backend
-poetry install
-poetry run pytest
-cd ..
-poetry -C backend run pre-commit run --all-files
-```
+Os testes do backend rodam via Docker (a imagem não inclui dependências de
+desenvolvimento, que são instaladas no container temporário). Testes unitários
+com cobertura:
 
 ```bash
-cd frontend
-npm install
-npm run lint
-npm run typecheck
-npm run build
+docker compose run --rm --no-deps backend sh -c \
+  'poetry install --with dev --no-interaction --no-ansi --no-root \
+  && COVERAGE_FILE=/tmp/.coverage poetry run pytest --cov=app --cov-report=term'
+```
+
+Pre-commit (black, isort, flake8, mypy e demais hooks), executado na raiz do
+repositório:
+
+```bash
+docker compose run --rm --no-deps -v "$PWD":/repo -w /repo backend sh -c \
+  'apt-get update -qq && apt-get install -y -qq git \
+  && git config --global --add safe.directory /repo \
+  && poetry -C backend install --with dev --no-interaction --no-ansi --no-root \
+  && poetry -C backend run pre-commit run --all-files'
+```
+
+Lint, typecheck e build do frontend, também via Docker (a imagem de runtime não
+inclui `node_modules`; `node_modules` e `.next` ficam em volumes anônimos para
+não sujar o host):
+
+```bash
+docker run --rm -v "$PWD/frontend":/app -v /app/node_modules -v /app/.next \
+  -w /app -e API_INTERNAL_URL=http://backend:8000 node:24-alpine sh -c \
+  'npm ci && npm run lint && npm run typecheck && npm run build'
+```
+
+Testes e2e (Playwright) do frontend, também via Docker, com a stack no ar. O
+container compartilha a rede do frontend para que `localhost:3000` seja a
+origem aceita pelo backend, e `--env-file .env` fornece `ADMIN_EMAIL` e
+`ADMIN_PASSWORD` (sem elas, o cenário de administrador é ignorado):
+
+```bash
+docker compose up -d --build
+docker run --rm --network container:cupcake-frontend --env-file .env \
+  -v "$PWD/frontend":/app -v /app/node_modules -v /app/test-results \
+  -w /app mcr.microsoft.com/playwright:v1.55.0-noble sh -c \
+  'npm ci && npm run test:e2e'
 ```
 
 `docker compose up -d --build` aplica migrations e seed no startup. O banco
