@@ -58,10 +58,15 @@ final com PostgreSQL 17 nem os testes de concorrência previstos na especificaç
 
 ## Credenciais administrativas
 
-O usuário administrador é criado automaticamente no seed, com `ADMIN_EMAIL` e
-`ADMIN_PASSWORD` fornecidos pelo `.env`. Substitua todos os valores de exemplo:
-use uma `SECRET_KEY` aleatória com pelo menos 32 caracteres e uma senha
-administrativa forte com pelo menos 12 caracteres. Não versione o `.env`.
+Para o primeiro acesso à área administrativa (`/admin`), use as credenciais
+provisórias configuradas no `.env.example`:
+
+- **Usuário:** `admin@example.com`
+- **Senha:** `ChangeMe123!`
+
+O usuário administrador é criado automaticamente no seed com `ADMIN_EMAIL` e
+`ADMIN_PASSWORD`. Altere a senha após o primeiro acesso. Em uma instalação já
+inicializada, o seed não redefine a senha de uma conta existente.
 
 ## Testes
 
