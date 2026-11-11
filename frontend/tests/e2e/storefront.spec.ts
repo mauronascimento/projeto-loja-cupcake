@@ -64,7 +64,12 @@ test('catálogo e navegação permanecem utilizáveis nos viewports definidos', 
 test('cliente cria, acompanha e cancela um pedido demonstrativo', async ({ page }) => {
   const browserErrors = collectBrowserErrors(page);
   await page.goto('/');
-  const addButton = page.getByRole('button', { name: 'Adicionar', exact: true }).first();
+  const productCard = page.locator('.product-card').first();
+  const productImage = await productCard.locator('.product-image').evaluate((element) =>
+    getComputedStyle(element).backgroundImage.match(/url\(["']?(.*?)["']?\)/)?.[1] ?? null,
+  );
+  expect(productImage).not.toBeNull();
+  const addButton = productCard.getByRole('button', { name: 'Adicionar', exact: true });
   await expect(addButton).toBeEnabled();
   await addButton.click();
   await page.goto('/cart');
@@ -100,6 +105,19 @@ test('cliente cria, acompanha e cancela um pedido demonstrativo', async ({ page 
   await page.getByRole('button', { name: 'Confirmar pedido' }).click();
   await expect(page).toHaveURL(/\/orders\/\d+\?created=1$/);
   await expect(page.getByText(/Pedido realizado/)).toBeVisible();
+  const orderImage = page.locator('.order-item-line .cart-thumb');
+  await expect(orderImage).toHaveCount(1);
+  await expect.poll(() => orderImage.evaluate((element) =>
+    getComputedStyle(element).backgroundImage.match(/url\(["']?(.*?)["']?\)/)?.[1] ?? null,
+  )).toBe(productImage);
+  if (!productImage) throw new Error('O produto não contém uma imagem de fundo.');
+  const imageResponse = await page.request.get(new URL(productImage, page.url()).toString());
+  expect(imageResponse.status()).toBe(200);
+  expect(imageResponse.headers()['content-type']).toMatch(/^image\//);
+  await page.reload();
+  await expect.poll(() => orderImage.evaluate((element) =>
+    getComputedStyle(element).backgroundImage.match(/url\(["']?(.*?)["']?\)/)?.[1] ?? null,
+  )).toBe(productImage);
 
   page.once('dialog', (dialog) => dialog.accept());
   await page.getByRole('button', { name: 'Cancelar pedido' }).click();

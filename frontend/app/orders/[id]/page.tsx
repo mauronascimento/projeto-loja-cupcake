@@ -93,7 +93,7 @@ export default function OrderDetailPage() {
             <section className="cart-lines">
               {order.items.map((item) => (
                 <article className="cart-line order-item-line" key={item.produto_id}>
-                  <div className="cart-thumb" aria-hidden="true" />
+                  <div className="cart-thumb" style={{ backgroundImage: `url(/api/v1/products/${item.produto_id}/image)` }} aria-hidden="true" />
                   <div className="cart-product"><h2>{item.nome_produto}</h2><p>{item.quantidade} × {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(item.preco_unitario))}</p></div>
                   <strong>{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Math.round(Number(item.preco_unitario) * 100) * item.quantidade / 100)}</strong>
                 </article>
